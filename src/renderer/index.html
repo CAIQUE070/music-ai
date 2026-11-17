@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music AI · Ableton Companion</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./renderer.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark"><span></span><span></span><span></span></div>
+        <div><div class="brand-name">MUSIC<span>AI</span></div><div class="brand-caption">PERSONAL MUSIC ASSISTANT</div></div>
+      </div>
+
+      <div class="side-label">WORKSPACE</div>
+      <div class="nav-item active"><span class="nav-icon">◈</span> Visão geral</div>
+      <a class="nav-item" href="#audioPanel"><span class="nav-icon">∿</span> Análise de áudio</a>
+      <a class="nav-item" href="#remixPanel"><span class="nav-icon">◉</span> Remix Studio</a>
+      <a class="nav-item" href="#assistantPanel"><span class="nav-icon">✳</span> Assistente IA</a>
+      <a class="nav-item" href="#bassPanel"><span class="nav-icon">⌁</span> Gerador de Bass</a>
+      <a class="nav-item" href="#settingsPanel"><span class="nav-icon">⚙</span> Configurações</a>
+      
+      <div class="nav-item disabled"><span class="nav-icon">▤</span> Biblioteca <small>PRÓXIMA FASE</small></div>
+
+      <div class="sidebar-bottom">
+        <div class="mini-status"><span class="status-dot" id="sidebarDot"></span><div><strong id="sidebarConnection">Desconectado</strong><small>Ableton Live 12 Suite</small></div></div>
+        <div class="version-label">BUILD 0.5.0 · BETA</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><div class="eyebrow">SEU ESTÚDIO, CONECTADO</div><h1>Visão geral</h1></div>
+        <div class="topbar-right"><div class="update-pill" id="updateStatus">ATUALIZAÇÕES · INICIALIZANDO</div>
+          <div class="connection-pill"><span class="status-dot" id="topDot"></span><span id="connectionText">Ableton desconectado</span></div>
+          <button class="button button-primary" id="connectButton" type="button"><span>↔</span> Conectar ao Ableton</button>
+        </div>
+      </header>
+
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <div class="hero-kicker"><span class="pulse-dot"></span> MUSIC AI SYSTEM · BUILD 0.5</div>
+          <h2>Seu estúdio.<br />Sua música. <em>Mais contexto.</em></h2>
+          <p>Planeje remixes completos, crie basslines originais e envie clips MIDI diretamente para uma nova faixa no Ableton Live.</p>
+          <div class="hero-actions"><button class="button button-outline" id="refreshButton" type="button" disabled>Sincronizar sessão <span>↻</span></button><button class="button button-quiet" id="checkUpdatesButton" type="button">Verificar atualizações</button></div>
+        </div>
+        <div class="orb-wrap" aria-hidden="true"><div class="orb-ring ring-one"></div><div class="orb-ring ring-two"></div><div class="orb-core"><div class="orb-core-inner"></div></div><div class="orb-spark spark-one"></div><div class="orb-spark spark-two"></div><div class="orb-caption">SESSION AWARENESS</div></div>
+      </section>
+
+      <section class="section-heading"><div><div class="eyebrow">LIVE SESSION</div><h3>Contexto musical</h3></div><span class="live-tag"><span></span> ATUALIZAÇÃO AUTOMÁTICA</span></section>
+      <section class="stats-grid">
+        <article class="stat-card"><div class="stat-label">ANDAMENTO</div><div class="stat-value"><span id="bpmValue">—</span><small> BPM</small></div><div class="stat-foot">Tempo da sessão</div></article>
+        <article class="stat-card"><div class="stat-label">TONALIDADE</div><div class="stat-value state-value" id="keyScaleValue">—</div><div class="stat-foot">Raiz e escala informadas pelo Live</div></article>
+        <article class="stat-card"><div class="stat-label">COMPASSO</div><div class="stat-value" id="timeSignatureValue">—</div><div class="stat-foot">Fórmula de compasso</div></article>
+        <article class="stat-card"><div class="stat-label">POSIÇÃO</div><div class="stat-value state-value" id="positionValue">—</div><div class="stat-foot">Compasso · tempo</div></article>
+        <article class="stat-card"><div class="stat-label">FAIXAS</div><div class="stat-value" id="trackCountValue">—</div><div class="stat-foot">Tracks na sessão</div></article>
+        <article class="stat-card"><div class="stat-label">CENAS</div><div class="stat-value" id="sceneCountValue">—</div><div class="stat-foot">Cenas no Session View</div></article>
+      </section>
+
+      <section class="workspace-grid">
+        <article class="panel tracks-panel">
+          <div class="panel-heading"><div><div class="eyebrow">TRACK OVERVIEW</div><h3>Faixas da sessão</h3><p class="panel-subtitle">Selecione uma faixa para acompanhar dispositivos, clips e estado.</p></div><span class="panel-icon">▤</span></div>
+          <div class="table-wrap">
+            <table class="track-table">
+              <thead><tr><th>#</th><th>FAIXA</th><th>DISPOSITIVOS</th><th>VOLUME</th><th>PAN</th><th>ESTADO</th><th></th></tr></thead>
+              <tbody id="trackTableBody"><tr><td colspan="7" class="table-empty">Conecte o Ableton e sincronize a sessão.</td></tr></tbody>
+            </table>
+          </div>
+          <div class="table-note" id="trackLimitNote">Aguardando dados do Ableton.</div>
+        </article>
+
+        <article class="panel transport-panel">
+          <div class="panel-heading"><div><div class="eyebrow">REMOTE CONTROL</div><h3>Transporte</h3></div><span class="panel-icon">◉</span></div>
+          <div class="transport-state"><span class="state-dot" id="transportDot"></span><strong id="playStateValue">AGUARDANDO</strong></div>
+          <div class="transport-actions"><button id="playButton" class="transport-button play" type="button" disabled>▶ <span>Play</span></button><button id="stopButton" class="transport-button" type="button" disabled>■ <span>Stop</span></button></div>
+          <div class="transport-meta"><div><span>LOOP</span><strong id="loopValue">—</strong></div><div><span>METRÔNOMO</span><strong id="metronomeValue">—</strong></div></div>
+          <div class="safety-note"><span>i</span> Play e Stop controlam apenas a reprodução. Selecionar uma faixa ou cena não dispara clips nem altera notas.</div>
+        </article>
+      </section>
+
+      <section class="detail-grid">
+        <article class="panel selected-panel">
+          <div class="panel-heading"><div><div class="eyebrow">SELECTED TRACK</div><h3 id="selectedTrackTitle">Nenhuma faixa selecionada</h3></div><span class="panel-icon">⌁</span></div>
+          <div class="detail-metrics"><div><span>VOLUME</span><strong id="selectedVolume">—</strong></div><div><span>PAN</span><strong id="selectedPan">—</strong></div><div><span>MUTE</span><strong id="selectedMute">—</strong></div><div><span>SOLO</span><strong id="selectedSolo">—</strong></div></div>
+          <div class="detail-section"><div class="detail-label">INSTRUMENTOS E EFEITOS</div><div class="chip-list" id="deviceList"><span class="muted-text">Nenhum dado recebido.</span></div></div>
+          <div class="detail-section"><div class="detail-label">CLIPS DA FAIXA</div><div class="chip-list" id="clipList"><span class="muted-text">Nenhum dado recebido.</span></div></div>
+        </article>
+
+        <article class="panel scenes-panel">
+          <div class="panel-heading"><div><div class="eyebrow">SESSION VIEW</div><h3>Cenas</h3><p class="panel-subtitle">Clique para selecionar uma cena no Ableton, sem reproduzi-la.</p></div><span class="panel-icon">▦</span></div>
+          <div id="sceneList" class="scene-list"><div class="empty-state">As cenas aparecerão aqui após a sincronização.</div></div>
+        </article>
+      </section>
+
+
+      <section class="panel audio-panel" id="audioPanel">
+        <div class="panel-heading"><div><div class="eyebrow">REFERENCE AUDIO INTELLIGENCE</div><h3>Analisador de áudio</h3><p class="panel-subtitle">Importe um WAV para medir duração, pico, RMS e variação de energia ao longo da faixa. O áudio fica local.</p></div><span class="panel-icon">∿</span></div>
+        <div class="audio-import-row"><button class="button button-primary" id="analyzeAudioButton" type="button">Selecionar WAV e analisar ↗</button><span class="chat-footnote">Suporta WAV PCM 8/16/24/32-bit e IEEE Float 32-bit · máximo 500 MB · até 60 min.</span></div>
+        <div class="audio-analysis-result" id="audioAnalysisResult"><div class="empty-state">Nenhuma referência analisada. Depois da análise, peça à IA um plano de remix baseado nas métricas.</div></div>
+      </section>
+
+      <section class="panel remix-panel" id="remixPanel">
+        <div class="panel-heading"><div><div class="eyebrow">FULL TRACK WORKFLOW</div><h3>Remix Studio</h3><p class="panel-subtitle">Monte um plano de produção para a faixa inteira, usando os dados da sessão e as informações que você fornecer. Nesta versão, a IA ainda não recebe o áudio de referência.</p></div><span class="panel-icon">◉</span></div>
+        <div class="remix-form-grid">
+          <label>Nome ou referência da faixa<input id="remixTrackName" type="text" maxlength="100" placeholder="Nome do projeto ou da faixa"></label>
+          <label>BPM original<input id="remixOriginalBpm" type="number" min="50" max="220" placeholder="Detectado pelo Ableton quando conectado"></label>
+          <label>Tonalidade<input id="remixKey" type="text" maxlength="24" placeholder="Ex.: F# minor"></label>
+          <label>Direção do remix<select id="remixDirection"><option value="Brazilian Bass / EDM de pista">Brazilian Bass / EDM de pista</option><option value="Brazilian Bass melódico">Brazilian Bass melódico</option><option value="House / club">House / club</option><option value="Progressive house">Progressive house</option><option value="Dance pop eletrônico">Dance pop eletrônico</option></select></label>
+          <label class="remix-wide">O que deseja preservar ou mudar?<textarea id="remixNotes" rows="3" maxlength="1800" placeholder="Ex.: preservar o vocal e a harmonia principal; reconstruir bateria e baixo; drop energético; intro DJ-friendly..."></textarea></label>
+        </div>
+        <div class="remix-actions"><button class="button button-primary" id="createRemixPlanButton" type="button">Criar plano completo do remix ↗</button><span class="chat-footnote">O plano cobre intro, groove, build, drops, break, transições e outro. Se houver WAV analisado, o resumo técnico será incluído no contexto da IA. Use áudio que você tenha direito de utilizar.</span></div>
+      </section>
+
+      <section class="creation-grid">
+        <article class="panel assistant-panel" id="assistantPanel">
+          <div class="panel-heading"><div><div class="eyebrow">MUSIC INTELLIGENCE</div><h3>Assistente musical</h3><p class="panel-subtitle">Converse sobre produção. A IA recebe o contexto atual da sua sessão.</p></div><span class="panel-icon">✳</span></div>
+          <div class="chat-messages" id="chatMessages"><div class="chat-bubble assistant">Olá! Sou seu co-produtor musical. Posso ajudar com planejamento de remix, basslines, Serum, harmonia, arranjo e mixagem. Configure o Groq GPT-OSS 120B em Configurações para começar.</div></div>
+          <form class="chat-form" id="chatForm"><textarea id="chatInput" rows="2" maxlength="6000" placeholder="Ex.: Me ensina a criar um mid bass de Brazilian Bass no Serum..."></textarea><button class="button button-primary" id="sendChatButton" type="submit">Enviar ↗</button></form>
+          <div class="chat-footnote">A IA sugere e explica. Nenhuma alteração no Ableton é executada automaticamente.</div>
+        </article>
+        <article class="panel bass-panel" id="bassPanel">
+          <div class="panel-heading"><div><div class="eyebrow">MIDI LAB</div><h3>Gerador de bassline</h3><p class="panel-subtitle">Crie uma linha original e envie como clip MIDI para uma nova faixa no Ableton.</p></div><span class="panel-icon">⌁</span></div>
+          <div class="bass-controls">
+            <label>Estilo<select id="bassStyle"><option value="brazilian">Brazilian Bass Bounce</option><option value="driving">Driving / Four on the floor</option><option value="syncopated">Syncopated</option><option value="minimal">Minimal</option></select></label>
+            <label>Tonalidade<select id="bassRoot"><option value="0">C</option><option value="1">C#</option><option value="2">D</option><option value="3">D#</option><option value="4">E</option><option value="5">F</option><option value="6">F#</option><option value="7">G</option><option value="8">G#</option><option value="9">A</option><option value="10">A#</option><option value="11">B</option></select></label>
+            <label>Registro<select id="bassRegister"><option value="sub">Sub bass · C1</option><option value="mid" selected>Mid bass · C2</option><option value="upper">High bass · C3</option></select></label>
+            <label>Escala<select id="bassScale"><option value="minor">Minor</option><option value="major">Major</option><option value="dorian">Dorian</option><option value="phrygian">Phrygian</option><option value="minor pentatonic">Minor pentatonic</option><option value="major pentatonic">Major pentatonic</option></select></label>
+            <label>Compassos<select id="bassBars"><option>2</option><option selected>4</option><option>8</option></select></label>
+          </div>
+          <div class="bass-preview" id="bassPreview"><div class="empty-state">Gere uma bassline para visualizar as notas.</div></div>
+          <div class="bass-actions"><button class="button button-outline" id="generateBassButton" type="button">Gerar bassline</button><button class="button button-primary" id="sendBassToAbletonButton" type="button" disabled>Enviar ao Ableton ↗</button><button class="button button-quiet" id="exportBassButton" type="button" disabled>Exportar .mid</button></div>
+          <p class="chat-footnote">O envio cria uma nova faixa MIDI e um clip na primeira cena. Não substitui faixas nem clips existentes.</p>
+        </article>
+      </section>
+
+      <section class="panel settings-panel" id="settingsPanel">
+        <div class="panel-heading"><div><div class="eyebrow">PREFERENCES & AI PROVIDER</div><h3>Configurações do assistente</h3><p class="panel-subtitle">Use uma API compatível com OpenAI. Endpoint Groq + modelo GPT-OSS 120B. A chave fica criptografada localmente no Windows.</p></div><span class="panel-icon">⚙</span></div>
+        <div class="settings-grid">
+          <label>Endpoint da API<input id="apiBaseUrl" type="url" value="https://api.groq.com/openai/v1" placeholder="https://api.groq.com/openai/v1"></label>
+          <label>Modelo<input id="apiModel" type="text" value="openai/gpt-oss-120b" placeholder="openai/gpt-oss-120b"></label>
+          <label>Raciocínio<select id="reasoningEffort"><option value="low">Low · mais rápido</option><option value="medium">Medium · equilibrado</option><option value="high">High · mais profundo</option></select></label>
+          <label class="key-field">Chave da API<input id="apiKey" type="password" placeholder="Cole sua chave (fica local e criptografada)"></label>
+          <button class="button button-primary save-settings" id="saveSettingsButton" type="button">Salvar configuração</button>
+        </div>
+        <div class="settings-feedback" id="settingsFeedback">Nenhuma chave configurada.</div>
+      </section>
+
+      <footer class="status-footer"><span class="footer-indicator" id="footerIndicator"></span><span id="messageText">Aguardando conexão com o Ableton.</span><span class="footer-right" id="updatedText">SEM SINCRONIZAÇÃO</span></footer>
+    </main>
+  </div>
+</body>
+</html>

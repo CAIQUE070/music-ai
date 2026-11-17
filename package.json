@@ -1,0 +1,60 @@
+{
+  "name": "music-ai-assistant",
+  "version": "0.5.0",
+  "description": "Assistente musical com análise WAV local, Groq e integração Ableton Live 12",
+  "main": "src/main/main.js",
+  "author": "Music AI",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check src/main/main.js && node --check src/preload/preload.js && node --check src/renderer/renderer.js && node --check src/main/music-engine.js && node --check src/main/audio-analyzer.js",
+    "dist": "electron-builder --win nsis --x64",
+    "publish": "electron-builder --win nsis --x64 --publish always",
+    "test:bass": "node tests/bass-generator-smoke.cjs",
+    "test:audio": "node tests/audio-analyzer-smoke.cjs"
+  },
+  "build": {
+    "appId": "com.musicai.assistant",
+    "productName": "Music AI",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Music-AI-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "CAIQUE070",
+        "repo": "music-ai"
+      }
+    ],
+    "artifactName": "Music-AI-Setup-${version}.${ext}"
+  },
+  "devDependencies": {
+    "electron": "^45.3.3",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2",
+    "node-osc": "^11.7.1"
+  }
+}
